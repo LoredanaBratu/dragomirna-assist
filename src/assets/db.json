@@ -1,0 +1,70 @@
+{
+  "events": [
+    {
+      "title": "Summer Four Cross",
+      "date": "Sep 13, 2019",
+      "startTime": "08:00",
+      "coverUrl": "https://image.redbull.com/rbcom/010/2016-02-16/1331777047411_1/0001/1/3000/1/a-pair-of-mountain-bikers-riding-in-the-dolomites-range-in-noertheastern-italy.jpg",
+      "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+      "routeLength": "24 km",
+      "latitude": "41.0082",
+      "longitude": "28.9784",
+      "id": "1"
+    },
+    {
+      "id": "2",
+      "title": "Forest Bike Challenge",
+      "coverUrl": "https://thumbor-static.factorymedia.com/3rKdKKXhwBOG3a5J4UQh5uPUIRk=/1600x1066/smart/http%3A%2F%2Fcoresites-cdn.factorymedia.com%2Fmpora_new%2Fwp-content%2Fuploads%2F2017%2F01%2FP-20161031-00854_News.jpg",
+      "description": "Every year brings another shift in the direction of the ever-expanding bike industry, and whether it’s fat bikes or e-bikes or big tyres or bigger frames, there’s always something that sticks out as a trend every year.So, because we have your best interests at heart and want you to be well placed when you next set out to buy some mountain bike gear, and also to be prepared for the things that’ll soon become more familiar sights on your trail days in 2017, we decided to put together a detailed guide on what you should expect in the next twelve months.",
+      "routeLength": "15 km",
+      "date": "Jul 20, 2019",
+      "startTime": "12:00",
+      "latitude": "26.0082",
+      "longitude": "2.9784"
+    },
+    {
+      "title": "Sea Landscape",
+      "date": "Oct 02, 2019",
+      "startTime": "10:00",
+      "coverUrl": "https://columbusbiketours.com/wp-content/uploads/2017/10/csm_mountainbike12_cb48dbcd32-1024x512.jpg",
+      "description": "Finally, mountain biking is a fun and social activity. It is often shared by clubs and groups who get out to ride together. This is one of the major reasons why you should consider giving mountain bike a try. It definitely provides a perfect opportunity to build personal bonds and make new friends with people who enjoy the same activities that you do. It has been observed that mountain bikers tend to be a pretty happy-go-lucky breed and happy people naturally tend to flock towards other happy people. Don’t hesitate to join biking clubs, communities and bike shops. Riding in groups can also help create a supportive feedback loop for you as you look to advance your skills and fitness. So you get to make friends and improve your mountain biking skills at the same time.",
+      "routeLength": "38 km",
+      "latitude": "23.0082",
+      "longitude": "5.9784",
+      "id": "3"
+    },
+    {
+      "id": "4",
+      "title": "Mountain Chill",
+      "coverUrl": "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/helena-mtn-bike-lead-013-1531428215.jpg?crop=1.00xw:0.964xh;0,0.0361xh&resize=1600:*",
+      "description": "Originally founded by four gold prospectors, Helena has been able to mine a different kind of precious resource. Helena has earned a silver-level IMBA Ride Center designation, with more than 75 miles of trails spread throughout the town and just outside of it. A free shuttle runs from May to October, schlepping riders from downtown to a different trailhead Wednesday through Sunday.",
+      "routeLength": "9 km",
+      "date": "Nov 31, 2018",
+      "startTime": "09:00",
+      "latitude": "29.0082",
+      "longitude": "15.9784"
+    },
+    {
+      "title": "Winter Road",
+      "date": "Aug 10, 2019",
+      "startTime": "12:00",
+      "coverUrl": "https://www.rei.com/dam/content_022817_0398_mountain_biking_etiquette_rules_trail_lg.jpg",
+      "description": "Most mountain biking takes place on trails that are shared with hikers, equestrians and other outdoor enthusiasts. Since 1988, the International Mountain Bicycling Association (IMBA) has offered the Rules of the Trail to promote responsible and courteous conduct on shared-use trails and to help everyone have enjoyable experiences.",
+      "routeLength": "33 km",
+      "latitude": "47.650497",
+      "longitude": "26.245765",
+      "id": "5"
+    },
+    {
+      "title": "Namibia: Mountain Biking",
+      "date": "Aug 24, 2019",
+      "startTime": "12:00",
+      "coverUrl": "http://www.klein-aus-vista.com/fileadmin/templates/slider-items/img/activities/mountain-biking/Klein-Aus-Vista-Mountain-Biking-03.jpg",
+      "description": "Namibia stands for endless horizons, wilderness and beautiful natural settings. An excellent way to experience the stunning nature of Namibia is to go on a mountain bike ride through these wide and mountainous landscapes.",
+      "routeLength": "12 km",
+      "latitude": "47.123815",
+      "longitude": "24.489851",
+      "id": "3LYvCG7"
+    }
+  ]
+}

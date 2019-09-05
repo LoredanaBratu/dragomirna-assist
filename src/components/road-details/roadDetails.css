@@ -1,0 +1,125 @@
+.searchBar {
+  position: absolute;
+  top: 5%;
+  left: 5%;
+}
+
+.form-control-borderless {
+  border: none;
+}
+
+.form-control {
+  font-family: "Montserrat";
+}
+
+.card-body {
+  position: absolute;
+  bottom: 5px;
+}
+
+.form-control-borderless:hover,
+.form-control-borderless:active,
+.form-control-borderless:focus {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.headTextCourse {
+  margin-top: 50px;
+}
+
+.headTime {
+  position: absolute;
+  font-family: "Montserrat";
+  font-size: 36px;
+  color: #ffffff;
+  font-weight: bold;
+  top: 58%;
+  left: 35%;
+}
+
+::placeholder {
+  font-family: "Montserrat";
+  font-size: 18px;
+}
+
+.time {
+  font-size: 24px;
+}
+
+.ranking {
+  margin-top: 30px;
+}
+
+.realTime {
+  font-family: "Montserrat";
+  font-size: 32px;
+  color: #000000;
+  font-weight: bold;
+}
+
+.yourPosition {
+  font-family: "Montserrat";
+  font-size: 24px;
+  color: #000000;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.tabsRow {
+  margin-top: 50px;
+}
+
+.switchButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.switchLink {
+  font-family: "Montserrat";
+  color: #9b9b9b;
+  font-weight: bold;
+  text-decoration: none !important;
+}
+
+.selectRoad {
+  font-family: "Montserrat";
+  font-weight: bold;
+  font-size: 22px;
+  text-transform: uppercase;
+}
+
+.roadType {
+  font-family: "Montserrat";
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.btn-link:hover {
+  color: #2f1b3c !important;
+}
+
+.switchActive {
+  font-family: "Montserrat";
+  color: #2f1b3c;
+  font-weight: bold;
+  text-decoration: none !important;
+}
+
+.searchButton {
+  background-color: #0c326d;
+  border-color: #0c326d;
+}
+
+.searchButton:hover {
+  background-color: #35455e;
+  border-color: #35455e;
+}
+
+.trailRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

@@ -1,26 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Route, Switch, BrowserRouter } from "react-router-dom";
+import Dashboard from "./components/dashboard";
+import Navbar from "./components/navbar/navbar";
+import aboutEvent from "./components/about-event";
+import roadDetails from "./components/road-details";
+import Harta from "./components/map";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Navbar />
+      <Switch>
+        <Route exact path="/mapa" component={Harta} />
+        <Route exact path="/" component={Dashboard} />
+        <Route exact path="/dashboard" component={Dashboard} />
+        <Route exact path="/about-event/:id" component={aboutEvent} />
+        <Route
+          exact
+          path="/road-details/:competitionId"
+          component={roadDetails}
+        />
+      </Switch>
+    </BrowserRouter>
   );
 }
 
-export default App;
+export default () => <App />;
