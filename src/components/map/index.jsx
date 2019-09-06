@@ -8,6 +8,7 @@ function Map({ children }) {
       defaultCenter={{ lat: 47.760419, lng: 26.225507 }}
     >
       {children}
+      {/* <Marker position={{ lat: 47.760419, lng: 26.225507 }} /> */}
     </GoogleMap>
   );
 }

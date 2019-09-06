@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Polyline } from "react-google-maps";
-
+import { Polyline, Marker, withGoogleMap, GoogleMap } from "react-google-maps";
 import "./roadDetails.css";
 import Map from "../map";
 import ParticipantRanking from "./participant-ranking/participantRanking";
@@ -9,6 +8,14 @@ import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
 
 const colors = ["red", "blue", "green"];
+// const socket = new WebSocket("wss://ws.achex.ca/");
+
+const socket = new WebSocket(
+  (window.location.protocol === "https:" ? "wss://" : "ws://") +
+    "mtb.assist.ro/" +
+    6 +
+    "/"
+);
 
 export default class roadDetails extends Component {
   constructor(props) {
@@ -17,7 +24,14 @@ export default class roadDetails extends Component {
       roadOpened: true,
       trailsToShow: null,
       gpx: [],
-      selectedTrails: {}
+      selectedTrails: {},
+      markers: [],
+      // markers: {},
+
+      latitude: null,
+      longitude: null,
+      message: {},
+      array: []
     };
   }
 
@@ -25,6 +39,72 @@ export default class roadDetails extends Component {
     const competitionId = this.props.match.params.competitionId;
     this.props.requestRank(competitionId);
     this.props.requestTrail(competitionId);
+
+    socket.onopen = function(e) {
+      console.log("Sending to server");
+      console.log("[open] Connection established");
+      socket.send("Test");
+      console.log("Sending to server");
+    };
+    socket.onmessage = event => {
+      // console.log("Message", event);
+      const data = JSON.parse(event.data);
+      console.log("Got message: " + event.data);
+      const { markers } = this.state;
+      let id = data.id.toString();
+      let lat = data.latitude;
+      let lng = data.longitude;
+      console.log(id, lat, lng, "nouuu");
+      // this.setState({ message: data });
+      // this.setState({ longitude: data.longitude, latitude: data.latitude });
+      // this.setState({ markers: { ...markers, id: { lat, lng } } });
+      console.log("markeeer", this.state.markers);
+
+      // const array = [];
+      const obj = { lat: data.latitude, lng: data.longitude };
+
+      // array.push(obj);
+
+      this.setState(previousState => ({
+        markers: [...previousState.markers, data]
+      }));
+
+      // this.setState({ markers: array }, () => {
+      //   console.log("markers-push", this.state.markers);
+      // });
+      // let id = data.id.toString();
+      // console.log("id", id);
+
+      // let newArray = this.state.array.push({ obj });
+      // this.setState({ markers: newArray });
+      // console.log(this.state.markers, "tttt");
+
+      // this.setState({
+      //   markers: [...this.state.markers, obj]
+      // });
+
+      // this.setState({ markers: [data.latitude, data.longitude] });
+    };
+
+    socket.onclose = function(event) {
+      if (event.wasClean) {
+        alert(
+          `[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`
+        );
+      } else {
+        // e.g. server process killed or network down
+        // event.code is usually 1006 in this case
+        alert("[close] Connection died");
+      }
+    };
+
+    socket.onerror = function(error) {
+      alert(`[error] ${error.message}`);
+    };
+  }
+
+  componentWillUnmount() {
+    socket.close();
   }
 
   trailSelected(trail) {
@@ -62,11 +142,20 @@ export default class roadDetails extends Component {
   roadOpen = () => {
     this.setState({ roadOpened: true });
   };
-
+  // setIconLong(map, name) {
+  //   var icon = new google.maps.MarkerImage(
+  //     "http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|" +
+  //       name +
+  //       "|00DDEB|000000",
+  //     null,
+  //     null,
+  //     new google.maps.Point(0, 42)
+  //   );
+  //   return icon;
+  // }
   render() {
-    // if (!this.state.gpx) return null;
     const { gpxData } = this.props;
-    const { roadOpened } = this.state;
+    const { roadOpened, markers } = this.state;
     let ranking = [];
     let trails = [];
 
@@ -77,12 +166,12 @@ export default class roadDetails extends Component {
     if (this.props.trail.count > 0) {
       trails = this.props.trail.results["0"].trails;
     }
+    console.log("message", this.state.message);
 
-    console.log("gpx", gpxData);
-    console.log("kkk", this.state.gpx);
-    console.log("trails", this.state.selectedTrails);
-    // console.log("aaa", trails);
+    // debugger;
 
+    console.log("state", this.state.latitude, ">>", this.state.longitude);
+    console.log("state", this.state.markers);
     return (
       <div>
         <Map
@@ -94,9 +183,9 @@ export default class roadDetails extends Component {
         // }}
         // onMapLoad={map => {
         //   var longTrail = new window.google.maps.Data();
-        //   if (gpx) {
+        //   if (this.state.gpx) {
         //     longTrail.loadGeoJson(
-        //       "https://cors-anywhere.herokuapp.com/" + gpx
+        //       "https://cors-anywhere.herokuapp.com/" + this.state.gpx
         //     );
         //   }
         //   //  longTrail.loadGeoJson("https://cors-anywhere.herokuapp.com/" + gpx);
@@ -125,14 +214,40 @@ export default class roadDetails extends Component {
         // }}
         >
           {Object.keys(gpxData).map((key, index) => (
-            <Polyline
-              path={[...gpxData[key]]}
-              key={key}
-              options={{
-                strokeColor: colors[index],
-                center: { lat: 47.760419, lng: 26.225507 }
-              }}
-            />
+            <div>
+              <Polyline
+                path={[...gpxData[key]]}
+                key={key}
+                options={{
+                  strokeColor: colors[index],
+                  center: { lat: 47.760419, lng: 26.225507 }
+                }}
+              />
+              {markers.map((el, key) => (
+                // {Object.keys(markers).map(key => (
+                <Marker
+                  key={el.id}
+                  // position={el}
+                  // position={markers[key]}
+                  options={{
+                    icon:
+                      "http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|" +
+                      el.first_name +
+                      " " +
+                      el.last_name +
+                      "|00DDEB|000000",
+                    // null, null, new google.maps.Point(0, 42)),
+
+                    anchor: new window.google.maps.Point(0, 42)
+                  }}
+                  position={{
+                    lat: parseFloat(el.latitude),
+                    lng: parseFloat(el.longitude)
+                  }}
+                  title={el.last_name + " " + el.first_name}
+                />
+              ))}
+            </div>
           ))}
         </Map>
 

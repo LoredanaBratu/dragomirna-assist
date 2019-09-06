@@ -17,6 +17,7 @@ export const requestRankService = request => {
   const url =
     "http://mtb.assist.ro/api/events/participant/raking/" +
     request.competitionId;
+  console.log("ranking", url);
 
   return fetch(proxyurl + url, parameters)
     .then(response => {
