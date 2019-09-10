@@ -4,8 +4,17 @@ import { GoogleMap, withGoogleMap } from "react-google-maps";
 function Map({ children }) {
   return (
     <GoogleMap
-      defaultZoom={12}
-      defaultCenter={{ lat: 47.760419, lng: 26.225507 }}
+      defaultZoom={13}
+      defaultMapTypeId="satellite"
+      // defaultCenter={{ lat: 47.760419, lng: 26.225507 }}
+      defaultCenter={{ lat: 47.64428, lng: 26.271314 }}
+      defaultOptions={{
+        minZoom: 12,
+        maxZoom: 16,
+        streetViewControl: false,
+        zoomControl: false,
+        mapTypeControl: false
+      }}
     >
       {children}
       {/* <Marker position={{ lat: 47.760419, lng: 26.225507 }} /> */}

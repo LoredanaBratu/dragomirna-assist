@@ -6,16 +6,17 @@ import ParticipantRanking from "./participant-ranking/participantRanking";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { Form } from "react-bootstrap";
+import MarkerClusterer from "react-google-maps/lib/components/addons/MarkerClusterer";
 
-const colors = ["red", "blue", "green"];
+// const colors = ["yellow", "blue"];
 // const socket = new WebSocket("wss://ws.achex.ca/");
 
-const socket = new WebSocket(
-  (window.location.protocol === "https:" ? "wss://" : "ws://") +
-    "mtb.assist.ro/" +
-    6 +
-    "/"
-);
+// const socket = new WebSocket(
+//   (window.location.protocol === "https:" ? "wss://" : "ws://") +
+//     "mtb.assist.ro/" +
+//     8 +
+//     "/"
+// );
 
 export default class roadDetails extends Component {
   constructor(props) {
@@ -25,13 +26,45 @@ export default class roadDetails extends Component {
       trailsToShow: null,
       gpx: [],
       selectedTrails: {},
-      markers: [],
-      // markers: {},
+      tempSearch: "",
+      searchValue: "",
+      filterValue: "",
+      // trails: [],
+      // markers: [
+      //   {
+      //     lat: 47.760419,
+      //     lng: 26.225507,
+      //     id: 1,
+      //     type_trail: "lg",
+      //     first_name: "Leahu",
+      //     last_name: "Ion"
+      //   },
+      //   {
+      //     lat: 47.770419,
+      //     lng: 26.225507,
+      //     id: 2,
+      //     type_trail: "cr",
+      //     first_name: "Leahu",
+      //     last_name: "Andrei"
+      //   },
+      //   {
+      //     lat: 47.780419,
+      //     lng: 26.225507,
+      //     id: 3,
+      //     type_trail: "mr",
+      //     first_name: "Leahu",
+      //     last_name: "Alex"
+      //   }
+      // ],
+      markers: {},
 
       latitude: null,
       longitude: null,
       message: {},
-      array: []
+      array: [],
+      filtered: {},
+      strtColor: "red",
+      color: ""
     };
   }
 
@@ -39,6 +72,12 @@ export default class roadDetails extends Component {
     const competitionId = this.props.match.params.competitionId;
     this.props.requestRank(competitionId);
     this.props.requestTrail(competitionId);
+    const socket = new WebSocket(
+      (window.location.protocol === "https:" ? "wss://" : "ws://") +
+        "mtb.assist.ro/" +
+        competitionId +
+        "/"
+    );
 
     socket.onopen = function(e) {
       console.log("Sending to server");
@@ -48,68 +87,73 @@ export default class roadDetails extends Component {
     };
     socket.onmessage = event => {
       // console.log("Message", event);
-      const data = JSON.parse(event.data);
+
+      const {
+        latitude: lat,
+        longitude: lng,
+        first_name,
+        last_name,
+        id,
+        type_trail
+      } = JSON.parse(event.data);
       console.log("Got message: " + event.data);
+
       const { markers } = this.state;
-      let id = data.id.toString();
-      let lat = data.latitude;
-      let lng = data.longitude;
-      console.log(id, lat, lng, "nouuu");
-      // this.setState({ message: data });
-      // this.setState({ longitude: data.longitude, latitude: data.latitude });
-      // this.setState({ markers: { ...markers, id: { lat, lng } } });
-      console.log("markeeer", this.state.markers);
+      const tempObj = { ...markers };
+      tempObj[id] = { id, lat, lng, first_name, last_name, type_trail };
+      this.setState({ markers: tempObj });
 
-      // const array = [];
-      const obj = { lat: data.latitude, lng: data.longitude };
-
-      // array.push(obj);
-
-      this.setState(previousState => ({
-        markers: [...previousState.markers, data]
-      }));
-
-      // this.setState({ markers: array }, () => {
-      //   console.log("markers-push", this.state.markers);
-      // });
-      // let id = data.id.toString();
-      // console.log("id", id);
-
-      // let newArray = this.state.array.push({ obj });
-      // this.setState({ markers: newArray });
-      // console.log(this.state.markers, "tttt");
-
-      // this.setState({
-      //   markers: [...this.state.markers, obj]
-      // });
-
-      // this.setState({ markers: [data.latitude, data.longitude] });
+      // const obj = { lat, lng, id, first_name, last_name, type_trail };
+      // this.setState(({ markers }) => ({
+      //   markers: [...markers, obj]
+      // }));
     };
 
     socket.onclose = function(event) {
       if (event.wasClean) {
-        alert(
+        console.log(
           `[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`
         );
       } else {
-        // e.g. server process killed or network down
-        // event.code is usually 1006 in this case
-        alert("[close] Connection died");
+        console.log("[close] Connection died");
       }
     };
 
     socket.onerror = function(error) {
-      alert(`[error] ${error.message}`);
+      console.log(`[error] ${error.message}`);
     };
   }
 
-  componentWillUnmount() {
-    socket.close();
+  async componentDidUpdate({ isLoading }) {
+    const { isLoading: currIsLoading } = this.props;
+    if (isLoading !== currIsLoading && isLoading) {
+      const { selectedTrails } = this.state;
+      const {
+        trail: { results = [] }
+      } = this.props;
+
+      const tempSelectedTrails = { ...selectedTrails };
+
+      results.forEach(res => {
+        res.trails.forEach(trail => {
+          const { GPX, id, type_trail } = trail;
+          const { getTrailGPXRequest } = this.props;
+          tempSelectedTrails[id] = { id, type_trail };
+
+          getTrailGPXRequest({ url: GPX, id });
+        });
+      });
+      this.setState({ selectedTrails: tempSelectedTrails });
+    }
   }
 
+  // componentWillUnmount() {
+  //   this.socket.close();
+  // }
+
   trailSelected(trail) {
-    const { GPX, id } = trail;
-    console.log("GPX", GPX);
+    const { GPX, id, type_trail } = trail;
+    this.setState({ filterValue: type_trail });
     const { selectedTrails } = this.state;
     const tempSelectedTrails = { ...selectedTrails };
     if (selectedTrails[id]) {
@@ -119,19 +163,18 @@ export default class roadDetails extends Component {
 
       removeTrailGPXRequest(id);
     } else {
-      tempSelectedTrails[id] = id;
+      tempSelectedTrails[id] = { id, type_trail };
       const { getTrailGPXRequest } = this.props;
       getTrailGPXRequest({ url: GPX, id });
     }
     this.setState({ selectedTrails: tempSelectedTrails });
-    // var checks = document.getElementsByName("trail");
-    // const selectedTrail = [];
-    // for (var i = 0; i < checks.length; i++) {
-    //   if (checks[i].type === "checkbox" && checks[i].checked === true) {
-    //     selectedTrail.push(checks[i].value);
-    //     this.setState({ gpx });
-    //     this.setState({ trailsToShow: selectedTrail });
-    //   }
+
+    // if (type_trail === "sh") {
+    //   let color = "red";
+    //   this.setState({ color: color });
+    // } else {
+    //   let color = "blue";
+    //   this.setState({ color: color });
     // }
   }
 
@@ -142,20 +185,69 @@ export default class roadDetails extends Component {
   roadOpen = () => {
     this.setState({ roadOpened: true });
   };
-  // setIconLong(map, name) {
-  //   var icon = new google.maps.MarkerImage(
-  //     "http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|" +
-  //       name +
-  //       "|00DDEB|000000",
-  //     null,
-  //     null,
-  //     new google.maps.Point(0, 42)
-  //   );
-  //   return icon;
-  // }
+
+  getUserIcon = ({ type_trail, first_name, last_name }) => {
+    let color = "00DDEB";
+
+    if (type_trail === "sh") {
+      color = "ffea00";
+    } else if (type_trail === "mr") {
+      color = "b71c1c";
+    }
+    const baseUrl =
+      "http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|";
+    // return `${baseUrl}${first_name} ${last_name}|${color}|000000`;
+    return `${baseUrl}${first_name.charAt(0) +
+      "."} ${last_name}|${color}|000000`;
+  };
+  getStrokeColor = ({ type_trail }) => {
+    let color = "#00DDEB";
+
+    if (type_trail === "sh") {
+      color = "#ffd600";
+    } else if (type_trail === "mr") {
+      color = "#b71c1c";
+    }
+    return color;
+    // return `${color}`;
+  };
+  getAnchor = ({ type_trail }) => {
+    let anchor = new window.google.maps.Point(0, 40);
+    if (type_trail === "sh") {
+      anchor = new window.google.maps.Point(0, 42);
+    }
+    return anchor;
+  };
+
+  handleSearch = ({ target: { value } }) => {
+    this.setState(
+      // { tempSearch: value },
+      // value === "" ? this.search : undefined
+      { searchValue: value }
+    );
+  };
+
+  search = () => {
+    const { tempSearch = "" } = this.state;
+    this.setState({ searchValue: tempSearch });
+    // socket.send(JSON.stringify({ search: searchValue }));
+  };
+  handleKeyDown = e => {
+    if (e.key === "Enter") {
+      console.log("do validate");
+      this.search();
+    }
+  };
+
   render() {
-    const { gpxData } = this.props;
-    const { roadOpened, markers } = this.state;
+    const { gpxData, isLoading } = this.props;
+    const {
+      roadOpened,
+      markers,
+      searchValue,
+      filterValue,
+      selectedTrails
+    } = this.state;
     let ranking = [];
     let trails = [];
 
@@ -166,105 +258,124 @@ export default class roadDetails extends Component {
     if (this.props.trail.count > 0) {
       trails = this.props.trail.results["0"].trails;
     }
-    console.log("message", this.state.message);
+    console.log(this.state.selectedTrails, "selectedT");
+    console.log(Object.keys(this.state.markers), "markers");
 
-    // debugger;
-
-    console.log("state", this.state.latitude, ">>", this.state.longitude);
-    console.log("state", this.state.markers);
     return (
       <div>
-        <Map
-        // id="map"
-        // options={{
-        //   center: { lat: 47.760419, lng: 26.225507 },
-        //   // center: { lat: 26.22678, lng: 47.75705 },
-        //   zoom: 12
-        // }}
-        // onMapLoad={map => {
-        //   var longTrail = new window.google.maps.Data();
-        //   if (this.state.gpx) {
-        //     longTrail.loadGeoJson(
-        //       "https://cors-anywhere.herokuapp.com/" + this.state.gpx
-        //     );
-        //   }
-        //   //  longTrail.loadGeoJson("https://cors-anywhere.herokuapp.com/" + gpx);
-
-        //   longTrail.setStyle(function(feature) {
-        //     return {
-        //       strokeColor: "rgb(0, 221, 236)",
-        //       strokeWeight: 8
-        //     };
-        //   });
-
-        //   longTrail.setMap(map);
-
-        //   let ws = new WebSocket(
-        //     (window.location.protocol === "https:" ? "wss://" : "ws://") +
-        //       "mtb.assist.ro/" +
-        //       3 +
-        //       "/"
-        //   );
-        //   console.log("test", ws);
-        //   ws.onmessage = function(message) {
-        //     // var data = JSON.parse(message.data);
-        //     console.log("Got message: " + message.data);
-        //     console.log(new Date());
-        //   };
-        // }}
-        >
-          {Object.keys(gpxData).map((key, index) => (
-            <div>
-              <Polyline
-                path={[...gpxData[key]]}
-                key={key}
-                options={{
-                  strokeColor: colors[index],
-                  center: { lat: 47.760419, lng: 26.225507 }
-                }}
-              />
-              {markers.map((el, key) => (
-                // {Object.keys(markers).map(key => (
-                <Marker
-                  key={el.id}
-                  // position={el}
-                  // position={markers[key]}
+        <Map>
+          {Object.keys(gpxData).map((key, index) => {
+            const trail = trails.find(tr => tr.id === +key) || {};
+            // console.log("trails", trails, key);
+            // console.log("trail", trail);
+            const strokeColor = this.getStrokeColor(trail);
+            // const { type_trail } = data;
+            return (
+              <div key={key}>
+                <Polyline
+                  path={[...gpxData[key]]}
+                  zoom={15}
                   options={{
-                    icon:
-                      "http://chart.googleapis.com/chart?chst=d_bubble_text_small&chld=bb|" +
-                      el.first_name +
-                      " " +
-                      el.last_name +
-                      "|00DDEB|000000",
-                    // null, null, new google.maps.Point(0, 42)),
-
-                    anchor: new window.google.maps.Point(0, 42)
+                    strokeColor: strokeColor,
+                    center: { lat: 47.760419, lng: 26.225507 },
+                    strokeWeight: 8
                   }}
-                  position={{
-                    lat: parseFloat(el.latitude),
-                    lng: parseFloat(el.longitude)
-                  }}
-                  title={el.last_name + " " + el.first_name}
                 />
-              ))}
-            </div>
-          ))}
+                {/* {// markers ||
+              (
+                markers.filter(
+                  marker => marker.type_trail.indexOf(filterValue) !== -1
+                ) || []
+              ).map(el => { */}
+                {Object.keys(markers)
+                  .reduce((curr, next) => {
+                    const { type_trail: type } = markers[next];
+                    // const { selectedTrails } = this.state;
+                    // if (
+                    //   selectedTrails.some(({ type_trail }) => type_trail === type)
+                    // ) {
+                    //   curr.push(markers[next]);
+                    // }
+                    // return curr;
+                    const containsTrail = Object.keys(selectedTrails).some(
+                      key => selectedTrails[key].type_trail === type
+                    );
+                    if (containsTrail) {
+                      curr.push(markers[next]);
+                    }
+                    return curr;
+                  }, [])
+                  .map(data => {
+                    const icon = this.getUserIcon(data);
+                    const anchor = this.getAnchor(data);
+
+                    const {
+                      id,
+                      lat,
+                      lng,
+                      type_trail,
+                      last_name,
+                      first_name
+                    } = data;
+
+                    const containsValue =
+                      last_name
+                        .toLowerCase()
+                        .includes(searchValue.toLowerCase()) ||
+                      first_name
+                        .toLowerCase()
+                        .includes(searchValue.toLowerCase());
+
+                    if (containsValue) {
+                      return (
+                        <Marker
+                          key={id}
+                          // defaultAnimation={
+                          //   this.props.google.maps.Animation.BOUNCE
+                          // }
+                          options={{
+                            icon,
+                            // anchor: new window.google.maps.Point(0, 42)
+                            anchor
+                          }}
+                          position={{
+                            lat: parseFloat(lat),
+                            lng: parseFloat(lng)
+                          }}
+                          title={last_name + " " + first_name}
+                          // style={{
+                          //   transform: `translate3D(0,0,0) scale(2, 3)`
+                          // }}
+                        />
+                      );
+                    }
+                    return null;
+                  })}
+              </div>
+            );
+          })}
         </Map>
 
         <div className="row">
           <div className="col-md-5">
             <div className="card-body row no-gutters align-items-center">
               <div className="col-auto">
-                <button className="btn btn-lg searchButton" type="submit">
+                <button
+                  className="btn btn-lg searchButton"
+                  type="submit"
+                  onClick={this.search}
+                >
                   <FontAwesomeIcon icon={faSearch} color="#ffffff" />
                 </button>
               </div>
 
               <div className="col">
                 <input
+                  onChange={this.handleSearch}
                   className="form-control form-control-lg form-control-borderless"
-                  type="search"
+                  type="text"
                   placeholder="Search participants"
+                  onKeyDown={this.handleKeyDown}
                 />
               </div>
             </div>
@@ -309,27 +420,41 @@ export default class roadDetails extends Component {
                   </div>
                 ) : (
                   <div>
-                    <div className="row mt-4">
-                      <div className="col-md-3">
-                        <h3 className="selectRoad">Select a road</h3>
+                    {isLoading ? (
+                      <div className="d-flex align-items-center justify-content-center">
+                        {" "}
+                        Loading ....{" "}
                       </div>
-                      {(trails || []).map((trail, index) => {
-                        return (
-                          <div key={index} className="col-md-2">
-                            <div className="row trailRow">
-                              <h3 className="roadType ">{trail.trail_name}</h3>{" "}
-                              <Form.Check
-                                className="mb-3 ml-2"
-                                aria-label={trail.trail_name}
-                                name="trail"
-                                value={trail.id}
-                                onChange={() => this.trailSelected(trail)}
-                              />
+                    ) : (
+                      <div className="row mt-4">
+                        <div className="col-md-3">
+                          <h3 className="selectRoad">Select a road</h3>
+                        </div>
+                        {(trails || []).map((trail, index) => {
+                          const strokeColor = this.getStrokeColor(trail);
+                          return (
+                            <div key={index} className="col-md-2">
+                              <div className="row trailRow">
+                                <h3
+                                  className="roadType "
+                                  style={{ color: strokeColor }}
+                                >
+                                  {trail.trail_name}
+                                </h3>{" "}
+                                <Form.Check
+                                  className="mb-3 ml-2"
+                                  aria-label={trail.trail_name}
+                                  name="trail"
+                                  checked={selectedTrails[trail.id]}
+                                  value={trail.id}
+                                  onChange={() => this.trailSelected(trail)}
+                                />
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

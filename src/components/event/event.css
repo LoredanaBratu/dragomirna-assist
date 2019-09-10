@@ -5,8 +5,8 @@
   object-position: center;
   height: 100%;
   width: 100%;
-  -webkit-filter: grayscale(100%);
-  filter: grayscale(100%);
+
+  /* filter: grayscale(100%); */
   transition: transform 0.1s;
 }
 .eventComponent:active {

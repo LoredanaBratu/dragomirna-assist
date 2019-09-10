@@ -1,4 +1,5 @@
 import {
+  REQUEST_TRAIL,
   REQUEST_TRAIL_SUCCESS,
   REQUEST_TRAIL_ERROR,
   GET_TRAIL_GPX_ERROR,
@@ -8,22 +9,31 @@ import {
 
 export default function trail_reducer(
   state = {
-    gpx: {}
+    gpx: {},
+    isLoading: false
   },
   { type, trail, payload }
 ) {
   switch (type) {
+    case REQUEST_TRAIL:
+      return {
+        ...state,
+        message: "Loading",
+        isLoading: true
+      };
     case REQUEST_TRAIL_SUCCESS:
       return {
         ...state,
         trail: trail,
         message: "Success",
-        isSuccess: true
+        isSuccess: true,
+        isLoading: false
       };
     case REQUEST_TRAIL_ERROR:
       return {
         ...state,
         trail: "",
+        isLoading: false,
         message: "Error",
         isSuccess: false
       };
@@ -58,6 +68,7 @@ export default function trail_reducer(
           return obj;
         }, {})
       };
+
     default:
       return state;
   }

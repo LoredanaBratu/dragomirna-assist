@@ -13,7 +13,8 @@ const mapStateToProps = state => ({
   gpxData: state.trail_reducer.gpx || {},
   competition: state.competition_reducer.competition || [],
   rank: state.rank_reducer.rank || [],
-  trail: state.trail_reducer.trail || []
+  trail: state.trail_reducer.trail || [],
+  isLoading: state.trail_reducer.isLoading
 });
 
 const mapDispatchToProps = {

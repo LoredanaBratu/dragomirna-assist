@@ -9,7 +9,7 @@ class Navbar extends Component {
         <div className="container">
           <a className="navbar-brand" href="/dashboard">
             <Logo />
-            <span className="navTitle">MTB ASSIST</span>
+            <span className="navTitle">ASSIST Sports Events</span>
           </a>
 
           <button

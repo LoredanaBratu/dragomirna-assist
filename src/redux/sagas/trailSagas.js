@@ -1,4 +1,4 @@
-import { put, call, takeLatest } from "redux-saga/effects";
+import { put, call, takeLatest, takeEvery } from "redux-saga/effects";
 import {
   REQUEST_TRAIL_ERROR,
   requestTrailSuccess,
@@ -59,7 +59,7 @@ export function* registerSaga(payload) {
   }
 }
 
-function* getTrailGpx({ url, id }) {
+function* getTrailGpx({ url, id, cb = () => null }) {
   try {
     const { features } = yield call(makeRequest, { url });
 
@@ -72,6 +72,7 @@ function* getTrailGpx({ url, id }) {
         }))
       })
     );
+    cb();
   } catch (err) {
     yield put(getTrailGPXError("Error"));
   }
@@ -82,5 +83,5 @@ export function* watchTrail() {
 }
 
 export function* wachGetTrailGpx() {
-  yield takeLatest(GET_TRAIL_GPX_REQUEST, getTrailGpx);
+  yield takeEvery(GET_TRAIL_GPX_REQUEST, getTrailGpx);
 }
